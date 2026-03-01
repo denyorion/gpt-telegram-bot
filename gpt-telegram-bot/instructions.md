@@ -42,4 +42,4 @@ bot/
 # Notes
 - Separate handlers by modality for maintainability.
 - Keep AI logic isolated from Telegram bot logic.
-- Use context management to maintain conversation flow.
+- Use context management to maintain conversation flow.fff
