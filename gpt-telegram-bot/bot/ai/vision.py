@@ -1,6 +1,8 @@
 """Image analysis via Google Gemini (OCR, scene description)."""
 import asyncio
 import base64
+import random
+import time
 
 import google.generativeai as genai
 
@@ -17,6 +19,19 @@ def _media_type(image_bytes: bytes) -> str:
     return "image/jpeg"
 
 
+def _is_rate_limit_error(exc: Exception) -> bool:
+    msg = str(exc)
+    name = exc.__class__.__name__.lower()
+    return (
+        "429" in msg
+        or "resource_exhausted" in msg.lower()
+        or "too many requests" in msg.lower()
+        or "ratelimit" in name
+        or "toomanyrequests" in name
+        or "resourceexhausted" in name
+    )
+
+
 def _analyze_image_sync(
     image_bytes: bytes,
     user_prompt: str = "",
@@ -30,11 +45,25 @@ def _analyze_image_sync(
     if user_prompt:
         parts.append(user_prompt)
     parts.append({"inline_data": {"mime_type": mime, "data": b64}})
-    response = model.generate_content(
-        parts,
-        generation_config={"max_output_tokens": 1024},
-    )
-    return (response.text or "").strip()
+    max_retries = 3
+    for attempt in range(max_retries + 1):
+        try:
+            response = model.generate_content(
+                parts,
+                generation_config={"max_output_tokens": 1024},
+            )
+            return (response.text or "").strip()
+        except Exception as e:
+            if _is_rate_limit_error(e):
+                if attempt < max_retries:
+                    backoff = min(60.0, (2**attempt) + random.random())
+                    time.sleep(backoff)
+                    continue
+                return (
+                    "Сейчас слишком много запросов к Gemini Vision (лимит). "
+                    "Пожалуйста, подожди минуту и попробуй снова."
+                )
+            raise
 
 
 async def analyze_image(

@@ -1,11 +1,12 @@
 """Handle photos for vision (e.g. GPT-4o Vision)."""
 import io
+import math
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot.ai.vision import analyze_image
 from bot.utils.context import context_manager
-from bot.utils.rate_limit import rate_limiter
+from bot.utils.rate_limit import allow_request
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -14,9 +15,11 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         return
     user_id = update.effective_user.id if update.effective_user else 0
 
-    if not rate_limiter.is_allowed(user_id):
+    allowed, wait_s = allow_request(user_id, cost=1)
+    if not allowed:
+        wait_text = f"{max(1, math.ceil(wait_s))} сек."
         await update.message.reply_text(
-            "Слишком много запросов. Подожди немного."
+            f"Слишком много запросов. Подожди {wait_text}."
         )
         return
 

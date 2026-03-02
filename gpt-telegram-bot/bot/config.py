@@ -15,3 +15,8 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "gemini-pro-latest")
 VISION_MODEL = os.getenv("VISION_MODEL", "gemini-pro-latest")
 MAX_CONTEXT_MESSAGES = int(os.getenv("MAX_CONTEXT_MESSAGES", "20"))
+
+# Rate limits (protect free-tier quotas; tune via .env)
+RATE_LIMIT_WINDOW_SECONDS = float(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+RATE_LIMIT_USER_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_USER_MAX_REQUESTS", "2"))
+RATE_LIMIT_GLOBAL_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_GLOBAL_MAX_REQUESTS", "2"))
