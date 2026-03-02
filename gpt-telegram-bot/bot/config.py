@@ -13,5 +13,5 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
 # Optional: Gemini model names
 LLM_MODEL = os.getenv("LLM_MODEL", "gemini-pro-latest")
-VISION_MODEL = os.getenv("VISION_MODEL", "ggemini-pro-latest")
+VISION_MODEL = os.getenv("VISION_MODEL", "gemini-pro-latest")
 MAX_CONTEXT_MESSAGES = int(os.getenv("MAX_CONTEXT_MESSAGES", "20"))
