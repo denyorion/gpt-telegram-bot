@@ -9,9 +9,9 @@ _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(_env_path)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
-# Optional: model names
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
-VISION_MODEL = os.getenv("VISION_MODEL", "gpt-4o")
+# Optional: Gemini model names
+LLM_MODEL = os.getenv("LLM_MODEL", "gemini-1.5-flash")
+VISION_MODEL = os.getenv("VISION_MODEL", "gemini-1.5-flash")
 MAX_CONTEXT_MESSAGES = int(os.getenv("MAX_CONTEXT_MESSAGES", "20"))

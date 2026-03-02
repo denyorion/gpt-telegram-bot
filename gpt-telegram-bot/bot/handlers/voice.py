@@ -17,7 +17,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     if not rate_limiter.is_allowed(user_id):
         await update.message.reply_text(
-            "Too many requests. Please wait a moment before sending more."
+            "Слишком много запросов. Подожди немного."
         )
         return
 
@@ -34,4 +34,4 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         response = await get_llm_response(user_id, context_manager)
         await update.message.reply_text(response)
     except Exception as e:
-        await update.message.reply_text(f"Error: {e!s}")
+        await update.message.reply_text(f"Ошибка: {e!s}")

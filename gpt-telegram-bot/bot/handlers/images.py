@@ -16,7 +16,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     if not rate_limiter.is_allowed(user_id):
         await update.message.reply_text(
-            "Too many requests. Please wait a moment before sending more."
+            "Слишком много запросов. Подожди немного."
         )
         return
 
@@ -35,4 +35,4 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         context_manager.add_message(user_id, "assistant", result)
         await update.message.reply_text(result)
     except Exception as e:
-        await update.message.reply_text(f"Error: {e!s}")
+        await update.message.reply_text(f"Ошибка: {e!s}")

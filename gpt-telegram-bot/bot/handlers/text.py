@@ -16,7 +16,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     if not rate_limiter.is_allowed(user_id):
         await update.message.reply_text(
-            "Too many requests. Please wait a moment before sending more messages."
+            "Слишком много запросов. Подожди немного перед следующим сообщением."
         )
         return
 
@@ -25,4 +25,4 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         response = await get_llm_response(user_id, context_manager)
         await update.message.reply_text(response)
     except Exception as e:
-        await update.message.reply_text(f"Error: {e!s}")
+        await update.message.reply_text(f"Ошибка: {e!s}")

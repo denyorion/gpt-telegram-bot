@@ -1,10 +1,12 @@
-"""Image analysis via GPT-4o Vision (OCR, scene description)."""
+"""Image analysis via Google Gemini (OCR, scene description)."""
+import asyncio
 import base64
-from openai import AsyncOpenAI
 
-from bot.config import OPENAI_API_KEY, VISION_MODEL
+import google.generativeai as genai
 
-client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+from bot.config import GOOGLE_API_KEY, VISION_MODEL
+
+genai.configure(api_key=GOOGLE_API_KEY)
 
 
 def _media_type(image_bytes: bytes) -> str:
@@ -15,25 +17,32 @@ def _media_type(image_bytes: bytes) -> str:
     return "image/jpeg"
 
 
+def _analyze_image_sync(
+    image_bytes: bytes,
+    user_prompt: str = "",
+    model_name: str = VISION_MODEL,
+) -> str:
+    """Sync: send image to Gemini Vision."""
+    mime = _media_type(image_bytes)
+    b64 = base64.standard_b64encode(image_bytes).decode("utf-8")
+    model = genai.GenerativeModel(model_name)
+    parts = []
+    if user_prompt:
+        parts.append(user_prompt)
+    parts.append({"inline_data": {"mime_type": mime, "data": b64}})
+    response = model.generate_content(
+        parts,
+        generation_config={"max_output_tokens": 1024},
+    )
+    return (response.text or "").strip()
+
+
 async def analyze_image(
     image_bytes: bytes,
     user_prompt: str = "",
     model: str = VISION_MODEL,
 ) -> str:
-    """Send image to GPT-4o Vision. user_prompt can be caption or question."""
-    b64 = base64.standard_b64encode(image_bytes).decode("utf-8")
-    media_type = _media_type(image_bytes)
-    content = [
-        {
-            "type": "image_url",
-            "image_url": {"url": f"data:{media_type};base64,{b64}"},
-        }
-    ]
-    if user_prompt:
-        content.insert(0, {"type": "text", "text": user_prompt})
-    response = await client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": content}],
-        max_tokens=1024,
+    """Send image to Gemini Vision. user_prompt can be caption or question."""
+    return await asyncio.to_thread(
+        _analyze_image_sync, image_bytes, user_prompt, model
     )
-    return response.choices[0].message.content or ""
