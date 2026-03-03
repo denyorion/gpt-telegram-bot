@@ -17,7 +17,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     user_id = update.effective_user.id if update.effective_user else 0
 
     # Voice flow hits Gemini multiple times: upload_file + transcription + LLM reply.
-    allowed, wait_s = allow_request(user_id, cost=3)
+    allowed, wait_s = allow_request(user_id, cost=2)
     if not allowed:
         wait_text = f"{max(1, math.ceil(wait_s))} сек."
         await update.message.reply_text(
