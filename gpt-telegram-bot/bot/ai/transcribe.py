@@ -1,10 +1,14 @@
 """Voice-to-text transcription using Google Gemini (google-genai v2026)."""
 import logging
 
-from bot.ai.ai_service import client
-from bot.config import LLM_MODEL
+from google import genai
+from google.genai import types
+
+from bot.config import GOOGLE_API_KEY, LLM_MODEL
 
 logger = logging.getLogger(__name__)
+
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 
 async def transcribe_audio(audio_bytes: bytes, filename: str = "voice.ogg") -> str:
@@ -16,8 +20,8 @@ async def transcribe_audio(audio_bytes: bytes, filename: str = "voice.ogg") -> s
         response = await client.aio.models.generate_content(
             model=LLM_MODEL,
             contents=[
-                "Transcribe this voice message to plain text. Reply only with the transcription, no extra commentary. Keep the same language as the speaker.",
-                {"mime_type": "audio/ogg", "data": audio_bytes},
+                "Transcribe this voice message to text. Output only transcribed text.",
+                types.Part.from_bytes(data=audio_bytes, mime_type="audio/ogg"),
             ],
         )
         if response and response.text:
@@ -27,4 +31,4 @@ async def transcribe_audio(audio_bytes: bytes, filename: str = "voice.ogg") -> s
         logger.error("Transcription error: %s", e)
         if "429" in str(e) or "resource_exhausted" in str(e).lower():
             return "Слишком много запросов. Подожди минуту и попробуй снова."
-        return "Ошибка распознавания аудио."
+        return "Не удалось распознать аудио."
